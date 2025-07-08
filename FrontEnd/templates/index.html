@@ -53,16 +53,35 @@
     </div>
   </header>
 
-  <!-- NAVEGAÇÃO -->
-<nav class="bg-success text-white py-3">
-  <div class="container d-flex justify-content-center gap-4 align-items-center">
-    <a href="{{ url_for('index') }}" class="text-white text-decoration-none fw-semibold">Sobre Nós</a>
-    <a href="{{ url_for('produtos') }}" class="text-white text-decoration-none fw-semibold">Produtos</a>
-    <a href="{{ url_for('admin') }}" class="text-white text-decoration-none fw-semibold">Administração</a>
-    <a href="{{ url_for('register') }}" class="text-white text-decoration-none fw-semibold">Cadastrar Usuário</a>
-    <a href="{{ url_for('logout')}}" class="text-white text-decoration-none fw-semibold">logout</a>
-  </div>
+  <!-- NAVEGAÇÃO ESTILO MODERNO -->
+<nav class="position-absolute top-0 start-50 translate-middle-x w-100 py-3 px-4" style="z-index: 10;">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+    <!-- Links -->
+    <div class="d-flex gap-3 flex-wrap">
+      <a href="{{ url_for('index') }}" class="text-dark text-decoration-none bg-white bg-opacity-75 rounded-pill px-4 py-2 fw-semibold">Sobre Nós</a>
+      <a href="{{ url_for('produtos') }}" class="text-dark text-decoration-none bg-white bg-opacity-75 rounded-pill px-4 py-2 fw-semibold">Produtos</a>
+      <a href="{{ url_for('admin') }}" class="text-dark text-decoration-none bg-white bg-opacity-75 rounded-pill px-4 py-2 fw-semibold">Administração</a>
+    </div>
+
+<!-- Botão Hamburguer com Dropdown -->
+<div class="dropdown">
+  <button class="btn bg-white bg-opacity-75 rounded-circle p-2 d-flex align-items-center justify-content-center"
+          type="button"
+          id="dropdownMenuButton"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          style="width: 40px; height: 40px;">
+    🧜‍♂️
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuButton">
+    <li><a class="dropdown-item" href="{{ url_for('login') }}">Login</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('register') }}">Cadastrar</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('logout') }}" >Logout</a></li>
+  </ul>
+</div>
 </nav>
+
 
   <!-- SOBRE A ONG -->
   <section class="container text-center my-5">
