@@ -6,10 +6,11 @@ from flask_login import (
     logout_user,
     login_required,
     UserMixin,
+    current_user,
 )
-from werkzeug.security import check_password_hash
-from forms import ProdutoForm, LoginForm
-from models import db, Produto, Users  # Certifique-se que Users está em models.py
+from werkzeug.security import check_password_hash, generate_password_hash
+from forms import ProdutoForm, LoginForm, RegisterForm  # vou criar o RegisterForm abaixo
+from models import db, Produto, Users
 
 app = Flask(
     __name__,
@@ -17,33 +18,52 @@ app = Flask(
     template_folder="../FrontEnd/templates",
 )
 
-# Configurações do app e banco de dados
-app.config["SECRET_KEY"] = "sua_chave_secreta_aqui"  # Use variável ambiente em produção
+app.config["SECRET_KEY"] = "sua_chave_secreta_aqui"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
-# Configuração do login
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.login_message_category = "info"
-
 
 @login_manager.user_loader
 def load_user(user_id):
     return Users.query.get(int(user_id))
 
 
-# ROTAS
-
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
+    form = RegisterForm()
+    if form.validate_on_submit():
+        # Verificar se já existe usuário com o email
+        existing_user = Users.query.filter_by(email=form.email.data).first()
+        if existing_user:
+            flash("Email já cadastrado. Faça login.", "warning")
+            return redirect(url_for("login"))
+
+        hashed_password = generate_password_hash(form.password.data)
+        novo_usuario = Users(email=form.email.data, password=hashed_password)
+        db.session.add(novo_usuario)
+        db.session.commit()
+        flash("Cadastro realizado com sucesso! Faça login.", "success")
+        return redirect(url_for("login"))
+
+    return render_template("register.html", form=form)
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("produtos"))
     form = LoginForm()
     if form.validate_on_submit():
         user = Users.query.filter_by(email=form.email.data).first()
