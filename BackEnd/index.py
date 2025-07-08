@@ -9,7 +9,7 @@ from flask_login import (
     current_user,
 )
 from werkzeug.security import check_password_hash, generate_password_hash
-from forms import ProdutoForm, LoginForm, RegisterForm  # vou criar o RegisterForm abaixo
+from forms import ProdutoForm, LoginForm, RegisterForm
 from models import db, Produto, Users
 
 app = Flask(
@@ -85,7 +85,6 @@ def logout():
 
 
 @app.route("/produtos", methods=["GET", "POST"])
-@login_required
 def produtos():
     form = ProdutoForm()
     produtos = Produto.query.all()
