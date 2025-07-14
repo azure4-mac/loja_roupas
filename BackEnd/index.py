@@ -12,18 +12,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from forms import ProdutoForm, LoginForm, RegisterForm
 from models import db, Produto, Users
 
-import os
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 app = Flask(
     __name__,
-    static_folder=os.path.join(BASE_DIR, "../FrontEnd/static"),
-    template_folder=os.path.join(BASE_DIR, "../FrontEnd/templates"),
+    static_folder="../FrontEnd/static",
+    template_folder="../FrontEnd/templates",
 )
 
-
-app.config["SECRET_KEY"] = "sua_chave_secreta_aqui"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
