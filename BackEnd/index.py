@@ -120,11 +120,3 @@ def delete_produto(id):
 def admin():
     return render_template("admin.html")
 
-
-# Cria o banco na primeira execução
-with app.app_context():
-    db.create_all()
-
-# Vercel precisa dessa função
-def handler(environ, start_response):
-    return app(environ, start_response)
