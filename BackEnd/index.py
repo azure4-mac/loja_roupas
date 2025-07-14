@@ -1,4 +1,3 @@
-import os
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
@@ -13,13 +12,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from forms import ProdutoForm, LoginForm, RegisterForm
 from models import db, Produto, Users
 
-# Caminho absoluto da raiz do projeto
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 app = Flask(
     __name__,
-    static_folder=os.path.join(BASE_DIR, "FrontEnd/static"),
-    template_folder=os.path.join(BASE_DIR, "FrontEnd/templates")
+    static_folder="../FrontEnd/static",
+    template_folder="../FrontEnd/templates",
 )
 
 app.config["SECRET_KEY"] = "sua_chave_secreta_aqui"
