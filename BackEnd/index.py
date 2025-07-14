@@ -125,6 +125,6 @@ def admin():
 with app.app_context():
     db.create_all()
 
-# handler para Vercel
+# Vercel precisa dessa função
 def handler(environ, start_response):
     return app(environ, start_response)
