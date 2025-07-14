@@ -121,7 +121,10 @@ def admin():
     return render_template("admin.html")
 
 
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True)
+# Cria o banco na primeira execução
+with app.app_context():
+    db.create_all()
+
+# handler para Vercel
+def handler(environ, start_response):
+    return app(environ, start_response)
