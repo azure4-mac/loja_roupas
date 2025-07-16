@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
+from flask_login import current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
     LoginManager,
@@ -9,7 +10,7 @@ from flask_login import (
     current_user,
 )
 from werkzeug.security import check_password_hash, generate_password_hash
-from forms import ProdutoForm, LoginForm, RegisterForm
+from forms import ProdutoForm, LoginForm, RegisterForm, PedidoAjudaForm
 from models import db, Produto, Users
 
 app = Flask(
@@ -103,6 +104,81 @@ def produtos():
         return redirect(url_for("produtos"))
 
     return render_template("produtos.html", form=form, produtos=produtos)
+
+from flask_mail import Mail, Message
+
+# Configurações de e-mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # ⚠️ você colocou errado: isso precisa ser smtp, não o seu email
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'amnipora@gmail.com'
+app.config['MAIL_PASSWORD'] = 'scxz fmbn lnnx uact'
+
+mail = Mail(app)
+
+@app.route('/pedir-ajuda', methods=['GET', 'POST'])
+def pedir_ajuda():
+    form = PedidoAjudaForm()
+    produtos = Produto.query.all()
+
+    if form.validate_on_submit():
+        nome = form.nome.data
+        email = form.email.data
+        mensagem = form.mensagem.data
+
+        msg = Message(
+            subject="Novo Pedido de Ajuda",
+            sender='amnipora@gmail.com',
+            recipients=['amnipora@gmail.com'],
+            body=f"""
+Novo pedido de ajuda recebido:
+
+Nome: {nome}
+E-mail: {email}
+
+Mensagem:
+{mensagem}
+            """
+        )
+
+        mail.send(msg)
+
+        flash("Pedido enviado com sucesso! Em breve entraremos em contato.", "success")
+        return redirect(url_for('pedir_ajuda'))
+
+    return render_template('pedir_ajuda.html', form=form, produtos=produtos)
+
+
+@app.route('/requisitar-produto/<int:produto_id>', methods=['POST'])
+def requisitar_produto(produto_id):
+    produto = Produto.query.get_or_404(produto_id)
+
+    if current_user.is_authenticated:
+        solicitante = current_user.email
+    else:
+        solicitante = "Usuário não autenticado"
+
+    msg = Message(
+        subject="Produto requisitado",
+        sender='amnipora@gmail.com',
+        recipients=['amnipora@gmail.com'],
+        body=f"""
+Um produto foi requisitado.
+
+Produto: {produto.nome}
+Tipo: {produto.tipo}
+Descrição: {produto.descricao}
+Contato do Produto: {produto.contato}
+
+Solicitado por: {solicitante}
+        """
+    )
+
+    mail.send(msg)
+
+    flash(f'Produto "{produto.nome}" requisitado com sucesso!', 'success')
+    return redirect(url_for('pedir_ajuda'))
+
 
 
 @app.route("/delete_produto/<int:id>", methods=["POST"])

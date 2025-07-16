@@ -34,3 +34,13 @@ class RegisterForm(FlaskForm):
         validators=[DataRequired(), EqualTo("password", message="Senhas devem ser iguais.")]
     )
     submit = SubmitField("Cadastrar")
+
+from wtforms import TextAreaField
+
+class PedidoAjudaForm(FlaskForm):
+    nome = StringField("Nome", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    mensagem = TextAreaField("Mensagem", validators=[DataRequired()])
+    submit = SubmitField("Enviar Pedido")
+
+
