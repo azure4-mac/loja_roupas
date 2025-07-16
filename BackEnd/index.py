@@ -45,7 +45,6 @@ def register():
         return redirect(url_for("index"))
     form = RegisterForm()
     if form.validate_on_submit():
-        # Verificar se já existe usuário com o email
         existing_user = Users.query.filter_by(email=form.email.data).first()
         if existing_user:
             flash("Email já cadastrado. Faça login.", "warning")
@@ -82,7 +81,7 @@ def login():
 def logout():
     logout_user()
     flash("Logout realizado com sucesso.", "info")
-    return redirect(url_for("login"))
+    return redirect(url_for("index"))
 
 
 @app.route("/produtos", methods=["GET", "POST"])
@@ -107,7 +106,6 @@ def produtos():
 
 from flask_mail import Mail, Message
 
-# Configurações de e-mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
