@@ -108,7 +108,7 @@ def produtos():
 from flask_mail import Mail, Message
 
 # Configurações de e-mail
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # ⚠️ você colocou errado: isso precisa ser smtp, não o seu email
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'amnipora@gmail.com'
