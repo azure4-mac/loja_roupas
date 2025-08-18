@@ -13,6 +13,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
 from forms import ProdutoForm, LoginForm, RegisterForm, PedidoAjudaForm
 from models import db, Produto, Users
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 
@@ -20,7 +21,15 @@ app.config["SECRET_KEY"] = "sua_chave_secreta_aqui"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+# --- Configuração do Flask-Mail ---
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'amnipora@gmail.com'
+app.config['MAIL_PASSWORD'] = 'scxz fmbn lnnx uact'
+
 db.init_app(app)
+mail = Mail(app)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
@@ -33,34 +42,37 @@ def load_user(user_id):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    # Passamos os formulários para a página principal para serem usados nos modais
+    login_form = LoginForm()
+    register_form = RegisterForm()
+    return render_template("index.html", login_form=login_form, register_form=register_form)
 
 
-@app.route("/register", methods=["GET", "POST"])
+@app.route("/register", methods=["POST"])
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for("index"))
     form = RegisterForm()
     if form.validate_on_submit():
         existing_user = Users.query.filter_by(email=form.email.data).first()
         if existing_user:
-            flash("Email já cadastrado. Faça login.", "warning")
-            return redirect(url_for("login"))
+            flash("Este email já está cadastrado. Por favor, faça login.", "warning")
+            return redirect(url_for("index"))
 
         hashed_password = generate_password_hash(form.password.data)
         novo_usuario = Users(email=form.email.data, password=hashed_password)
         db.session.add(novo_usuario)
         db.session.commit()
-        flash("Cadastro realizado com sucesso! Faça login.", "success")
-        return redirect(url_for("login"))
+        flash("Cadastro realizado com sucesso! Agora você pode fazer login.", "success")
+        return redirect(url_for("index"))
 
-    return render_template("register.html", form=form)
+    # Se a validação falhar, exibe os erros e redireciona
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(f"Erro no campo {getattr(form, field).label.text}: {error}", "danger")
+    return redirect(url_for("index"))
 
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["POST"])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for("produtos"))
     form = LoginForm()
     if form.validate_on_submit():
         user = Users.query.filter_by(email=form.email.data).first()
@@ -69,8 +81,12 @@ def login():
             flash("Login realizado com sucesso!", "success")
             return redirect(url_for("produtos"))
         else:
-            flash("Email ou senha incorretos.", "danger")
-    return render_template("login.html", form=form)
+            flash("Email ou senha incorretos. Tente novamente.", "danger")
+    else:
+        # Se a validação falhar (ex: campo vazio)
+        flash("Por favor, preencha todos os campos para entrar.", "danger")
+        
+    return redirect(url_for("index"))
 
 
 @app.route("/logout")
@@ -101,15 +117,6 @@ def produtos():
 
     return render_template("produtos.html", form=form, produtos=produtos)
 
-from flask_mail import Mail, Message
-
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'amnipora@gmail.com'
-app.config['MAIL_PASSWORD'] = 'scxz fmbn lnnx uact'
-
-mail = Mail(app)
 
 @app.route('/pedir-ajuda', methods=['GET', 'POST'])
 def pedir_ajuda():
@@ -135,9 +142,7 @@ Mensagem:
 {mensagem}
             """
         )
-
         mail.send(msg)
-
         flash("Pedido enviado com sucesso! Em breve entraremos em contato.", "success")
         return redirect(url_for('pedir_ajuda'))
 
@@ -168,12 +173,9 @@ Contato do Produto: {produto.contato}
 Solicitado por: {solicitante}
         """
     )
-
     mail.send(msg)
-
     flash(f'Produto "{produto.nome}" requisitado com sucesso!', 'success')
     return redirect(url_for('pedir_ajuda'))
-
 
 
 @app.route("/delete_produto/<int:id>", methods=["POST"])
