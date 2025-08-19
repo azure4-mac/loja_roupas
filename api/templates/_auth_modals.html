@@ -1,0 +1,71 @@
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('login') }}">
+          {{ login_form.hidden_tag() }}
+          <div class="mb-3">
+            {{ login_form.email.label(class="form-label") }}
+            {{ login_form.email(class="form-control", placeholder="seu@email.com") }}
+          </div>
+          <div class="mb-3">
+            {{ login_form.password.label(class="form-label") }}
+            {{ login_form.password(class="form-control", placeholder="Sua senha") }}
+          </div>
+          <div class="d-grid">
+            {{ login_form.submit(class="btn btn-success") }}
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <p class="mb-0">Não tem uma conta? 
+          <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">
+            Cadastre-se aqui
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerModalLabel">Criar Conta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('register') }}" novalidate>
+          {{ register_form.hidden_tag() }}
+          <div class="mb-3">
+            {{ register_form.email.label(class="form-label") }}
+            {{ register_form.email(class="form-control", placeholder="Digite seu melhor email") }}
+          </div>
+          <div class="mb-3">
+            {{ register_form.password.label(class="form-label") }}
+            {{ register_form.password(class="form-control", placeholder="Crie uma senha forte") }}
+          </div>
+          <div class="mb-3">
+            {{ register_form.confirm_password.label(class="form-label") }}
+            {{ register_form.confirm_password(class="form-control", placeholder="Confirme sua senha") }}
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-success">{{ register_form.submit.label.text }}</button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <p class="mb-0">Já tem uma conta? 
+          <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">
+            Entrar
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
