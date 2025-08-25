@@ -17,12 +17,10 @@ from flask_mail import Mail, Message
 
 app = Flask(__name__)
 
-app.config["SECRET_KEY"] = "sua_chave_secreta_aqui"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'amnipora@gmail.com'
 app.config['MAIL_PASSWORD'] = 'scxz fmbn lnnx uact'
@@ -167,6 +165,21 @@ Solicitado por: {solicitante}
     mail.send(msg)
     flash(f'Produto "{produto.nome}" requisitado com sucesso!', 'success')
     return redirect(url_for('pedir_ajuda'))
+
+@app.route("/edit_produto/<int:id>", methods=["GET", "POST"])
+@login_required
+def edit_produto(id):
+    produto = Produto.query.get_or_404(id)
+    form = ProdutoForm(obj=produto)
+    if form.validate_on_submit():
+        produto.nome = form.nome.data
+        produto.descricao = form.descricao.data
+        produto.tipo = form.tipo.data
+        produto.contato = form.contato.data
+        db.session.commit()
+        flash("Produto atualizado com sucesso!", "success")
+        return redirect(url_for("produtos"))
+    return render_template("edit_produto.html", form=form, produto=produto)
 
 
 @app.route("/delete_produto/<int:id>", methods=["POST"])
