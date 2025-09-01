@@ -17,6 +17,7 @@ from flask_mail import Mail, Message
 
 app = Flask(__name__)
 
+app.config["SECRET_KEY"] = "sua_chave_secreta_aqui"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
